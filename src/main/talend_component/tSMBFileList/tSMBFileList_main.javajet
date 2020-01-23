@@ -80,8 +80,6 @@
         final boolean hasIterateCons=  ( NodeUtil.getOutgoingConnections(node, EConnectionType.ITERATE).size()>0);
         final String  relPathType   =  ElementParameterParser.getValue(node, "__PATH_TYPE__");
 	List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
-        
-
         %>
         final java.util.List<jcifs.smb.SmbFile> files =new <%=cid%>Helper().list( <%=cid%>Handle );
         globalMap.put("<%=cid%>_MAX_LINE", files.size() );

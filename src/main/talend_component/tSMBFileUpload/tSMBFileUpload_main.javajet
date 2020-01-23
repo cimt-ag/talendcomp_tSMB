@@ -41,7 +41,7 @@ try{
     if( !<%=cid%>_Source.exists() )
         throw new java.io.IOException("The source file \"" + <%=cid%>_Source.getAbsolutePath() + "\" doesn't exist.");
         
-    <%=cid%>_Handle=new jcifs.smb.SmbFile(<%=cid%>_Handle,<%=cid%> _Source.getName());
+    <%=cid%>_Handle=new jcifs.smb.SmbFile(<%=cid%>_Handle,<%=cid%>_Source.getName());
 
     <%if(!overwrite){%>
     if( <%=cid%>_Handle.exists() )
