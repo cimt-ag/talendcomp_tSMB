@@ -1,0 +1,130 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode 
+		org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.metadata.IMetadataTable 
+		org.talend.core.model.metadata.IMetadataColumn 
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		org.talend.core.model.metadata.types.JavaTypesManager
+		org.talend.core.model.metadata.types.JavaType
+                org.talend.core.model.process.EConnectionType
+                org.talend.core.model.utils.NodeUtil
+
+		java.util.List 
+                java.util.Map		
+	" 
+%>
+<% 
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode)codeGenArgument.getArgument();
+    String cid = node.getUniqueName();	
+    final boolean use_subdirs = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__") );
+    final boolean use_auth    = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__AUTH_REQUIRED__") );
+    String url  = ElementParameterParser.getValue(node, "__CONTEXT__");
+    String path = ElementParameterParser.getValue(node, "__PATH__");
+    
+    if(path!=null && (path.startsWith("\"/") || path.startsWith("\"./") )){
+        path="\""+path.substring(path.indexOf("/")+1); 
+    }
+    final boolean use_path   = (path!=null && path.trim().length()>0);
+    
+    if(!url.endsWith("/\"") && url.endsWith("\"")){
+        url=url.substring(0, url.length()-1) +  "/\"";
+    }
+%>
+
+    jcifs.smb.SmbFile <%=cid%>Handle=new jcifs.smb.SmbFile(
+            <%=url%> 
+            <%
+            if(use_path){
+                %> , <%=path%> <%
+            } 
+            if(use_auth){
+                %> , ((jcifs.smb.NtlmPasswordAuthentication) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION"))<%
+            }%>
+            );
+            
+            
+	
+        class <%=cid%>Helper{
+            final jcifs.smb.SmbFilenameFilter filter=new jcifs.smb.SmbFilenameFilter(){
+                @Override
+                public boolean accept(jcifs.smb.SmbFile dir, String name) throws jcifs.smb.SmbException {
+                    return true; /*template*/
+                }
+            };
+            
+            java.util.List<jcifs.smb.SmbFile> list(jcifs.smb.SmbFile parent) throws jcifs.smb.SmbException{
+                
+                java.util.List<jcifs.smb.SmbFile> files=new java.util.ArrayList<jcifs.smb.SmbFile>();
+                
+                if(parent==null  || !parent.exists()){
+                    return files;
+                }
+                for(jcifs.smb.SmbFile child : parent.listFiles(filter)){
+                    if(child.isDirectory()){
+                        <% if("true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__") )){  // recursive  %>
+                        files.addAll( list(child) );
+                        <% } %>
+                        continue;
+                    }
+                    files.add(child);
+                }
+                return files;
+            }
+            
+        };
+        <%
+        final boolean hasIterateCons=  ( NodeUtil.getOutgoingConnections(node, EConnectionType.ITERATE).size()>0);
+        final String  relPathType   =  ElementParameterParser.getValue(node, "__PATH_TYPE__");
+	List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
+        
+
+        %>
+        final java.util.List<jcifs.smb.SmbFile> files =new <%=cid%>Helper().list( <%=cid%>Handle );
+        globalMap.put("<%=cid%>_MAX_LINE", files.size() );
+        int <%=cid%>NB_Count=0;
+        
+        
+        <%if(relPathType.equals("RELURL")){%>
+            String baseUri= <%=url%>;
+        <%} else if(relPathType.equals("RELPATH")){%>
+            String baseUri=<%=cid%>Handle.getPath();
+        <%}%>
+        
+        for(jcifs.smb.SmbFile child : files){
+            
+            <%if(relPathType.equals("ABS")){%>
+            <%} else if(relPathType.equals("CAN")){%>
+                final String fpath=child.getCanonicalPath();
+            <%} else if(relPathType.equals("UNC")){%>
+                final String fpath=child.getUncPath();
+            <%} else if(relPathType.equals("DFS")){%>
+                final String fpath=child.getDfsPath();
+            <%} else if(relPathType.equals("RELURL")){%>
+                final String fpath=child.getPath().replace(baseUri, "./"));
+            <%}%>
+            
+            
+            globalMap.put("<%=cid%>_NB_LINE", (++<%=cid%>NB_Count) );
+            
+
+            <%if(hasIterateCons){%>
+                
+                globalMap.put("<%=cid%>_name", child.getName() );
+                globalMap.put("<%=cid%>_path", fpath );
+                globalMap.put("<%=cid%>_size", child.length() );
+                globalMap.put("<%=cid%>_lastModified", new java.util.Date(child.getDate()) );
+                
+          <%}
+            for( IConnection con : outConns){ %>
+                 
+                <%=con.getName()%>.name = child.getName();
+                <%=con.getName()%>.path = child.getPath(); 
+                <%=con.getName()%>.size = child.getContentLengthLong();
+                <%=con.getName()%>.lastModified = new java.util.Date(child.getDate());
+            <%}%>            
+        
+        

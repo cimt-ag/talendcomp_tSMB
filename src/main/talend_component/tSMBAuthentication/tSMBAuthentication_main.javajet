@@ -1,0 +1,54 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode 
+		org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.metadata.IMetadataTable 
+		org.talend.core.model.metadata.IMetadataColumn 
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		org.talend.core.model.metadata.types.JavaTypesManager
+		org.talend.core.model.metadata.types.JavaType
+		java.util.List 
+    	java.util.Map		
+	" 
+%>
+<% 
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode)codeGenArgument.getArgument();
+    String cid = node.getUniqueName();	
+    String auth=ElementParameterParser.getValue(node, "__AUTH_TYPE__");
+
+    %>
+    jcifs.smb.NtlmPasswordAuthentication auth= <% 
+    if( auth.equals("A") ){
+        %>  jcifs.smb.NtlmPasswordAuthentication.ANONYMOUS; <%
+    } else if( auth.equals("B") ){
+        %>  new jcifs.smb.NtlmPasswordAuthentication( <%=ElementParameterParser.getValue(node, "__USERINFO__")%> ) ; <%
+    } else if( auth.equals("C") ){
+        %>
+            
+            new jcifs.smb.NtlmPasswordAuthentication( 
+                <%=ElementParameterParser.getValue(node, "__DOMAIN__")%>,
+                <%=ElementParameterParser.getValue(node, "__USERNAME__")%>,
+                routines.system.PasswordEncryptUtil.decryptPassword(<%=ElementParameterParser.getEncryptedValue(node, "__PASSWORD__")%>)
+                ) ; <%
+    } else if( auth.equals("D") ){
+        %>  new jcifs.smb.NtlmPasswordAuthentication( 
+                <%=ElementParameterParser.getValue(node, "__DOMAIN__")%>,
+                <%=ElementParameterParser.getValue(node, "__CHALLENGE__").getBytes()%>,
+                <%=ElementParameterParser.getValue(node, "__ANSIHASH__").getBytes()%>,
+                <%=ElementParameterParser.getValue(node, "__UNICODEHASH__").getBytes()%>
+            ) ; <%
+    } else {
+            %> null; <%
+    }
+    %>
+    
+    if( auth!= null){
+        globalMap.put("<%=cid%>_AUTHENTICATION", auth);
+        globalMap.put("<%=cid%>_AUTH_AVAILABLE", Boolean.TRUE);
+    } else {
+        globalMap.put("<%=cid%>_AUTH_AVAILABLE", Boolean.FALSE);
+    }
+    

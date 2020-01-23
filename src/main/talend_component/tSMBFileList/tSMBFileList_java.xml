@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<COMPONENT> 
+    <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" 
+             
+            PLATEFORM="ALL" RELEASE_DATE="20080229A" SERIAL="" STARTABLE="true" STATUS="ALPHA" VERSION="0.102"> 
+        <SIGNATURE/> 
+    </HEADER>  
+    <FAMILIES> 
+        <FAMILY>Sample</FAMILY> 
+    </FAMILIES>  
+    <DOCUMENTATION> 
+        <URL/> 
+    </DOCUMENTATION>  
+    <CONNECTORS> 
+        <CONNECTOR CTYPE="FLOW" />
+        <CONNECTOR CTYPE="ITERATE" />
+        <CONNECTOR CTYPE="SUBJOB_OK" />
+        <CONNECTOR CTYPE="SUBJOB_ERROR" />
+        <CONNECTOR CTYPE="COMPONENT_OK" />
+        <CONNECTOR CTYPE="COMPONENT_ERROR" />
+    </CONNECTORS>  
+    <PARAMETERS> 
+        <PARAMETER 
+                NAME="AUTH_REQUIRED" 
+                FIELD="CHECK" 
+                NUM_ROW="1"
+                REQUIRED="true"
+        >
+                <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+        <PARAMETER 
+            NAME="AUTHENTICATION" 
+            FIELD="COMPONENT_LIST" 
+            NUM_ROW="1"
+            FILTER="REGEXP:^(tSMBAuthentication)(.)*"
+            REQUIRED="false"
+            SHOW_IF="AUTH_REQUIRED == 'true'"
+        />
+
+        <PARAMETER FIELD="TEXT" NAME="CONTEXT"  NUM_ROW="5"/>  
+        <PARAMETER FIELD="TEXT" NAME="PATH"     NUM_ROW="10" REQUIRED="false" />  
+        <PARAMETER 
+                NAME="LIST_SUBDIRS" 
+                FIELD="CHECK" 
+                NUM_ROW="1"
+                REQUIRED="true"
+        >
+                <DEFAULT>true</DEFAULT>
+        </PARAMETER>
+        
+        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="15"> 
+            <TABLE READONLY="true"> 
+                <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="size"          TYPE="id_Long" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="lastModified"  TYPE="id_Date" READONLY="true" CUSTOM="true"/>  
+            </TABLE> 
+        </PARAMETER> 
+        <PARAMETER FIELD="CLOSED_LIST" NAME="PATH_TYPE" NUM_ROW="15"> 
+            <ITEMS DEFAULT="ABSOLUTE">
+                    <ITEM NAME="ABSOLUTE"   VALUE="ABS" />
+                    <ITEM NAME="CANONICAL"  VALUE="CAN" />
+                    <ITEM NAME="UNC"        VALUE="UNC" />
+                    <ITEM NAME="DFS"        VALUE="DFS" />
+                    <ITEM NAME="RELATIVE_TO_PATH" VALUE="RELURL" />
+                    <ITEM NAME="RELATIVE_TO_URL"  VALUE="RELPATH" />
+            </ITEMS>
+        </PARAMETER> 
+
+    </PARAMETERS>  
+    <ADVANCED_PARAMETERS> 
+    </ADVANCED_PARAMETERS>  
+    <CODEGENERATION></CODEGENERATION>  
+    <RETURNS> 
+        <RETURN AVAILABILITY="FLOW" NAME="MAX_LINE" TYPE="id_Integer"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="NB_LINE"  TYPE="id_Integer"/> 
+    </RETURNS> 
+</COMPONENT>

@@ -1,0 +1,66 @@
+<%@ jet 
+	imports="
+		org.talend.core.model.process.INode 
+		org.talend.core.model.process.ElementParameterParser 
+		org.talend.core.model.metadata.IMetadataTable 
+		org.talend.core.model.metadata.IMetadataColumn 
+		org.talend.core.model.process.IConnection
+		org.talend.core.model.process.IConnectionCategory
+		org.talend.designer.codegen.config.CodeGeneratorArgument
+		org.talend.core.model.metadata.types.JavaTypesManager
+		org.talend.core.model.metadata.types.JavaType
+                org.talend.core.model.process.EConnectionType
+                org.talend.core.model.utils.NodeUtil
+	" 
+%>
+<% 
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode)codeGenArgument.getArgument();
+    String cid = node.getUniqueName();	
+    final boolean overwrite = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__OVERWRITE__") );
+    final boolean use_auth  = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__AUTH_REQUIRED__") );
+%>
+try{
+    jcifs.smb.SmbFile <%=cid%>_Handle=new jcifs.smb.SmbFile(
+            <%=ElementParameterParser.getValue(node, "__PATH__")%> 
+            <%if(use_auth){%> 
+            , ((jcifs.smb.NtlmPasswordAuthentication) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION"))<%
+            }%>
+            );
+    java.io.File <%=cid%>_Source = new java.io.File( <%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%> );
+    
+    if(!<%=cid%>_Handle.exists())
+        throw new java.io.FileNotFoundException("The destination \"" + <%=cid%>_Handle.getPath() + "\" doesn't exist.");
+        
+    if(!<%=cid%>_Handle.canWrite())
+        throw new java.io.IOException("The file \"" + <%=cid%>_Handle.getPath() + "\" isn't writeable.");
+
+    if(!<%=cid%>_Handle.isFile())
+        throw new java.io.IOException("The destination \"" + <%=cid%>_Handle.getPath() + "\" is no directory.");
+
+    if( !<%=cid%>_Source.exists() )
+        throw new java.io.IOException("The source file \"" + <%=cid%>_Source.getAbsolutePath() + "\" doesn't exist.");
+        
+    <%=cid%>_Handle=new jcifs.smb.SmbFile(<%=cid%>_Handle,<%=cid%> _Source.getName());
+
+    <%if(!overwrite){%>
+    if( <%=cid%>_Handle.exists() )
+        throw new java.io.IOException("The destination \"" + <%=cid%>_Handle.getPath() + "\" already exists.");
+    <%}%>    
+
+   
+    long <%=cid%>_start=System.currentTimeMillis();
+    long <%=cid%>_written=java.nio.file.Files.copy( <%=cid%>_Source.toPath(),  <%=cid%>_Handle.getOutputStream() );
+
+    final double <%=cid%>_spend = ((System.currentTimeMillis()- <%=cid%>_start)/1000.0);
+    final double <%=cid%>_avg   = ((<%=cid%>_written/1024.0) / <%=cid%>_spend ) ;
+    
+    globalMap.put("<%=cid%>_TIMESPEND", ((System.currentTimeMillis()- <%=cid%>_start)/1000.0) );
+    globalMap.put("<%=cid%>_TRANSFERRED", <%=cid%>_written );
+}catch(Exception <%=cid%>_ex){
+    globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_ex.getMessage());
+    globalMap.put("<%=cid%>_ERROR", <%=cid%>_ex );
+    throw <%=cid%>_ex;
+}
+
+              

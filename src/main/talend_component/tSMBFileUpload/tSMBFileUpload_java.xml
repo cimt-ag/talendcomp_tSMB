@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<COMPONENT> 
+    <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" 
+             
+            PLATEFORM="ALL" RELEASE_DATE="20080229A" SERIAL="" STARTABLE="true" STATUS="ALPHA" VERSION="0.102"> 
+        <SIGNATURE/> 
+    </HEADER>  
+    <FAMILIES> 
+        <FAMILY>Sample</FAMILY> 
+    </FAMILIES>  
+    <DOCUMENTATION> 
+        <URL/> 
+    </DOCUMENTATION>  
+    <CONNECTORS> 
+        <CONNECTOR CTYPE="FLOW" />
+        <CONNECTOR CTYPE="ITERATE" />
+        <CONNECTOR CTYPE="SUBJOB_OK" />
+        <CONNECTOR CTYPE="SUBJOB_ERROR" />
+        <CONNECTOR CTYPE="COMPONENT_OK" />
+        <CONNECTOR CTYPE="COMPONENT_ERROR" />
+    </CONNECTORS>  
+    <PARAMETERS> 
+        <PARAMETER 
+            NAME="AUTH_REQUIRED" 
+            FIELD="CHECK" 
+            NUM_ROW="1"
+            REQUIRED="true"
+        >
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+        <PARAMETER 
+            NAME="AUTHENTICATION" 
+            FIELD="COMPONENT_LIST" 
+            NUM_ROW="1"
+            FILTER="REGEXP:^(tSMBAuthentication)(.)*"
+            REQUIRED="false"
+            SHOW_IF="AUTH_REQUIRED == 'true'"
+        />
+
+        <PARAMETER FIELD="TEXT" NAME="PATH"     NUM_ROW="10" REQUIRED="false" />  
+        <PARAMETER FIELD="FILE" NAME="SOURCEFILE"     NUM_ROW="10" REQUIRED="false" />  
+        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="15" REQUIRED="false" />  
+        
+    </PARAMETERS>  
+    <ADVANCED_PARAMETERS> 
+    </ADVANCED_PARAMETERS>  
+    <CODEGENERATION></CODEGENERATION>  
+    <RETURNS> 
+        <RETURN AVAILABILITY="FLOW" NAME="AVG_DOWNLOAD_RATE" TYPE="id_Double"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="TIMESPEND" TYPE="id_Integer"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="TRANSFERRED" TYPE="id_Long"/> 
+        <RETURN AVAILABILITY="AFTER" NAME="ERROR_MESSAGE" TYPE="id_String"/> 
+    </RETURNS> 
+</COMPONENT>
