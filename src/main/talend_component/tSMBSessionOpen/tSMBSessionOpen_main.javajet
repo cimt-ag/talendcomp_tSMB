@@ -1,0 +1,80 @@
+<%@ jet 
+    imports="
+    org.talend.core.model.process.INode 
+    org.talend.core.model.process.ElementParameterParser 
+    org.talend.core.model.metadata.IMetadataTable 
+    org.talend.core.model.metadata.IMetadataColumn 
+    org.talend.core.model.process.IConnection
+    org.talend.core.model.process.IConnectionCategory
+    org.talend.designer.codegen.config.CodeGeneratorArgument
+    org.talend.core.model.metadata.types.JavaTypesManager
+    org.talend.core.model.metadata.types.JavaType
+    java.util.List 
+    java.util.Map		
+    " 
+    %>
+<% 
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode)codeGenArgument.getArgument();
+    String cid = node.getUniqueName();
+    String auth_type  = ElementParameterParser.getValue(node, "__AUTH_TYPE__");
+    String hostname  = ElementParameterParser.getValue(node, "__HOSTNAME__");
+%>
+
+
+    com.hierynomus.smbj.SMBClient <%=cid%>_client = null;
+    com.hierynomus.smbj.connection.Connection <%=cid%>_connection = null;
+    com.hierynomus.smbj.session.Session <%=cid%>_session = null;
+    try{
+        final com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth    
+        
+        <% if(auth_type.equals("C")){%>
+            = (com.hierynomus.smbj.auth.AuthenticationContext) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION");
+        <%} else if(auth_type.equals("B")){%>
+            = new com.hierynomus.smbj.auth.AuthenticationContext(
+                    <%=ElementParameterParser.getValue(node, "__USERNAME__")%>
+                  , routines.system.PasswordEncryptUtil.decryptPassword(<%=ElementParameterParser.getEncryptedValue(node, "__PASSWORD__")%>).toCharArray()
+                  , <%=ElementParameterParser.getValue(node, "__DOMAIN__")%>
+                );
+        <%} else {%>
+             = com.hierynomus.smbj.auth.AuthenticationContext.anonymous();
+        <%}%>
+         
+
+        <%=cid%>_client = new com.hierynomus.smbj.SMBClient();
+
+        <%=cid%>_connection = <%=cid%>_client.connect(<%=hostname%>);
+        <%=cid%>_session = <%=cid%>_connection.authenticate( <%=cid%>_auth );     
+        
+        globalMap.put("<%=cid%>_client", <%=cid%>_client);
+        globalMap.put("<%=cid%>_connection", <%=cid%>_connection);
+        globalMap.put("<%=cid%>_session", <%=cid%>_session);
+    
+    }catch(Exception <%=cid%>_ex){
+       // handle closing of smb handles
+        if (<%=cid%>_session != null) {
+            try {
+                <%=cid%>_session.close();
+                <%=cid%>_session=null;
+            } catch (Throwable t) { /* ignore */  }
+        }
+        if (<%=cid%>_connection != null && <%=cid%>_connection.isConnected()) {
+            try {
+                <%=cid%>_connection.close();
+            } catch (Throwable t) {
+
+                try {
+                    <%=cid%>_connection.close(true);
+                } catch (Throwable nt) { /* ignore */ }
+            }
+
+            <%=cid%>_connection=null;
+        }
+
+        if (<%=cid%>_client != null) {
+            try {
+                <%=cid%>_client.close();
+            } catch (Throwable t) { /* ignore */ }
+            <%=cid%>_client=null;
+        }        
+    }

@@ -20,21 +20,28 @@
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();	
-    List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
+    final boolean dieOnError  =  "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__DIE_ON_ERROR__") ) ;
+
     %>
 
-// loop over smb files using de.cimt.talendcomp.tsmb.SMBListFlowStruct <%=cid%>_child
-
+    // loop over smb files using de.cimt.talendcomp.tsmb.SMBListFlowStruct <%=cid%>_child
+    try{
+        de.cimt.talendcomp.tsmb.SMBHelper.delete(<%=cid%>_share, <%=cid%>_child);
+    
     globalMap.put("<%=cid%>_NAME", <%=cid%>_child.getName() );
     globalMap.put("<%=cid%>_PATH", <%=cid%>_child.getPath() );
-    globalMap.put("<%=cid%>_SIZE", <%=cid%>_child.getSize() );
-    globalMap.put("<%=cid%>_LASTMODIFIED", <%=cid%>_child.getLastModified() );
 
-    <%for( IConnection con : outConns){ %>
+    <%
+    for( IConnection con : NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA)){ %>
 
         <%=con.getName()%>.name = <%=cid%>_child.getName();
         <%=con.getName()%>.path = <%=cid%>_child.getPath(); 
-        <%=con.getName()%>.size = <%=cid%>_child.getSize();
-        <%=con.getName()%>.lastModified = <%=cid%>_child.getLastModified() ;
-
     <%}%>            
+
+    }catch(Exception <%=cid%>_delete_ex ){
+        globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_delete_ex.getMessage());
+        globalMap.put("<%=cid%>_ERROR", <%=cid%>_delete_ex );
+        <% if(dieOnError){%>
+            throw <%=cid%>_download_ex;            
+        <%}%>
+    }

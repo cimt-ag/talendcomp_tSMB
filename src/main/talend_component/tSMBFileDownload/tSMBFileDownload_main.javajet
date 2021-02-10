@@ -11,51 +11,56 @@
 		org.talend.core.model.metadata.types.JavaType
                 org.talend.core.model.process.EConnectionType
                 org.talend.core.model.utils.NodeUtil
+                
+                java.util.List 
+                java.util.Map
 	" 
 %>
 <% 
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();	
+    final String downloaddir    = ElementParameterParser.getValue(node, "__DOWNLOADDIR__") ;
     final boolean overwrite = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__OVERWRITE__") );
-    final boolean use_auth  = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__AUTH_REQUIRED__") );
+    List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
+    final boolean dieOnError  =  "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__DIE_ON_ERROR__") ) ;
 %>
-try{
-    jcifs.smb.SmbFile <%=cid%>_Handle=new jcifs.smb.SmbFile(
-            <%=ElementParameterParser.getValue(node, "__PATH__")%> 
-            <%if(use_auth){%> 
-            , ((jcifs.smb.NtlmPasswordAuthentication) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION"))<%
-            }%>
-            );
-    java.io.File <%=cid%>_Target = new java.io.File( <%=ElementParameterParser.getValue(node, "__DOWNLOADDIR__")%> );
-    if(!<%=cid%>_Target.exists())
-        <%=cid%>_Target.mkdirs();
-            
-    <%=cid%>_Target=new java.io.File(<%=cid%>_Target, <%=cid%>_Handle.getName());
-            
-    if(!<%=cid%>_Handle.exists())
-        throw new java.io.FileNotFoundException("The file \"" + <%=cid%>_Handle.getPath() + "\" doesn't exist.");
-        
-    if(!<%=cid%>_Handle.canRead())
-        throw new java.io.IOException("The file \"" + <%=cid%>_Handle.getPath() + "\" isn't readable.");
+    long <%=cid%>_COMPLETED_TRANSFER_BYTES = globalMap.containsKey("<%=cid%>_COMPLETED_TRANSFER_BYTES") ? ((long) globalMap.get("<%=cid%>_COMPLETED_TRANSFER_BYTES")) : 0l;
+    long <%=cid%>_TIMESPEND_MS = globalMap.containsKey("<%=cid%>_TIMESPEND_MS") ? ((long) globalMap.get("<%=cid%>_TIMESPEND_MS")) : 0l;
 
-    <%if(!overwrite){%>
-    if( <%=cid%>_Target.exists() )
-        throw new java.io.IOException("The target \"" + <%=cid%>_Target.getAbsolutePath() + "\" already exists.");
-    <%}%>    
+    try{ 
+        de.cimt.talendcomp.tsmb.SMBTransferStruct <%=cid%>_file = de.cimt.talendcomp.tsmb.SMBHelper.download(<%=cid%>_share, <%=cid%>_child, new java.io.File(<%=downloaddir%>), <%=overwrite%>);
+        <%=cid%>_COMPLETED_TRANSFER_BYTES += <%=cid%>_file.getSize();
+        <%=cid%>_TIMESPEND_MS += <%=cid%>_file.getTimespend();
+
+        globalMap.put("<%=cid%>_NAME", <%=cid%>_file.getName() );
+        globalMap.put("<%=cid%>_PATH", <%=cid%>_file.getAbsolutePath() );
+        globalMap.put("<%=cid%>_SIZE", <%=cid%>_file.getSize() );
+        globalMap.put("<%=cid%>_DOWNLOAD_SPEED",  <%=cid%>_file.getSpeed() );
+
+        globalMap.put("<%=cid%>_AVG_DOWNLOAD_SPEED",
+            de.cimt.talendcomp.tsmb.SMBTransferStruct.computeSpeedHumanReadable( 
+               <%=cid%>_COMPLETED_TRANSFER_BYTES, <%=cid%>_TIMESPEND_MS
+            )
+        );
+        globalMap.put("<%=cid%>_COMPLETED_TRANSFER_BYTES", <%=cid%>_COMPLETED_TRANSFER_BYTES);
+        globalMap.put("<%=cid%>_TIMESPEND_MS", <%=cid%>_TIMESPEND_MS);
+
+
+      <%
+        for( IConnection con : outConns){ %>
+            <%=con.getName()%>.name = <%=cid%>_file.getName();
+            <%=con.getName()%>.path = <%=cid%>_file.getAbsolutePath(); 
+            <%=con.getName()%>.size = <%=cid%>_file.getSize();
+            <%=con.getName()%>.timespend = <%=cid%>_file.getTimespend();
+        <%}%>            
+
+    }catch(Exception <%=cid%>_download_ex ){
+        globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_download_ex.getMessage());
+        globalMap.put("<%=cid%>_ERROR", <%=cid%>_download_ex );
+        <% if(dieOnError){%>
+            throw <%=cid%>_download_ex;            
+        <%}%>
+    }
+
     
-    long <%=cid%>_start=System.currentTimeMillis();
-    long <%=cid%>_written=java.nio.file.Files.copy( <%=cid%>_Handle.getInputStream(), <%=cid%>_Target.toPath(), new java.nio.file.CopyOption[]{} );
-
-    final double <%=cid%>_spend = ((System.currentTimeMillis()- <%=cid%>_start)/1000.0);
-    final double <%=cid%>_avg   = ((<%=cid%>_written/1024.0) / <%=cid%>_spend ) ;
-    
-    globalMap.put("<%=cid%>_TIMESPEND", ((System.currentTimeMillis()- <%=cid%>_start)/1000.0) );
-    globalMap.put("<%=cid%>_TRANSFERRED", <%=cid%>_written );
-}catch(Exception <%=cid%>_ex){
-    globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_ex.getMessage());
-    globalMap.put("<%=cid%>_ERROR", <%=cid%>_ex );
-    throw <%=cid%>_ex;
-}
-
-              

@@ -6,7 +6,7 @@
         <SIGNATURE/> 
     </HEADER>  
     <FAMILIES> 
-        <FAMILY>Sample</FAMILY> 
+        <FAMILY>Network</FAMILY> 
     </FAMILIES>  
     <DOCUMENTATION> 
         <URL/> 
@@ -20,35 +20,114 @@
         <CONNECTOR CTYPE="COMPONENT_ERROR" />
     </CONNECTORS>  
     <PARAMETERS> 
-        <PARAMETER 
-            NAME="AUTH_REQUIRED" 
-            FIELD="CHECK" 
-            NUM_ROW="1"
-            REQUIRED="true"
-        >
-            <DEFAULT>false</DEFAULT>
-        </PARAMETER>
+          <!-- start intherited by tsmbfilelist -->
+                 
+        <PARAMETER FIELD="CLOSED_LIST" NAME="AUTH_TYPE" NUM_ROW="1"> 
+            <ITEMS DEFAULT="ANONYMOUS_ACCESS">
+                    <ITEM NAME="ANONYMOUS_ACCESS" VALUE="A" />
+                    <ITEM NAME="USE_AUTH_TYPE" VALUE="B" />
+                    <ITEM NAME="USE_SESSION_TYPE" VALUE="C" />
+            </ITEMS>
+        </PARAMETER> 
         <PARAMETER 
             NAME="AUTHENTICATION" 
             FIELD="COMPONENT_LIST" 
             NUM_ROW="1"
             FILTER="REGEXP:^(tSMBAuthentication)(.)*"
             REQUIRED="false"
-            SHOW_IF="AUTH_REQUIRED == 'true'"
+            SHOW_IF="AUTH_TYPE == 'USE_AUTH_TYPE'"
+        />
+        <PARAMETER 
+            NAME="SESSION" 
+            FIELD="COMPONENT_LIST" 
+            NUM_ROW="1"
+            FILTER="REGEXP:^(tSMBSessionOpen)(.)*"
+            REQUIRED="false"
+            SHOW_IF="AUTH_TYPE == 'USE_SESSION_TYPE'"
         />
 
-        <PARAMETER FIELD="TEXT" NAME="PATH"     NUM_ROW="10" REQUIRED="false" />  
-        <PARAMETER FIELD="FILE" NAME="SOURCEFILE"     NUM_ROW="10" REQUIRED="false" />  
-        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="15" REQUIRED="false" />  
+        <PARAMETER FIELD="TEXT" NAME="HOSTNAME"  NUM_ROW="5" SHOW_IF="AUTH_TYPE != 'USE_SESSION_TYPE'"/>  
         
+        <PARAMETER FIELD="TEXT" NAME="SHARE"     NUM_ROW="10" REQUIRED="false"/>  
+        <PARAMETER FIELD="TEXT" NAME="SMBPATH"   NUM_ROW="11" REQUIRED="false" />  
+        
+        <PARAMETER NAME="LIST_MODE" FIELD="CLOSED_LIST" NUM_ROW="15">
+            <ITEMS DEFAULT="FILES">
+                <ITEM NAME="FILES" VALUE="FILES" />
+                <ITEM NAME="DIRECTORIES" VALUE="DIRECTORIES" />
+                <ITEM NAME="BOTH" VALUE="BOTH" />
+            </ITEMS>
+        </PARAMETER>
+
+
+        <PARAMETER NAME="CASE_SENSITIVE" FIELD="CLOSED_LIST" NUM_ROW="15">
+            <ITEMS DEFAULT="YES">
+                <ITEM NAME="YES" VALUE="YES" />
+                <ITEM NAME="NO" VALUE="NO" />
+            </ITEMS>
+        </PARAMETER>
+        
+        <PARAMETER 
+                NAME="LIST_SUBDIRS" 
+                FIELD="CHECK" 
+                NUM_ROW="15"
+                REQUIRED="true"
+        >
+                <DEFAULT>true</DEFAULT>
+        </PARAMETER>
+ 
+        <PARAMETER NAME="SORT" FIELD="CLOSED_LIST" NUM_ROW="15">
+            <ITEMS DEFAULT="NONE">
+                <ITEM NAME="NONE" VALUE="A" />
+                <ITEM NAME="FILENAME_DIRSTART" VALUE="B" SHOW_IF="LIST_MODE == 'BOTH'"/>
+                <ITEM NAME="FILENAME_DIRAFTER" VALUE="C" SHOW_IF="LIST_MODE == 'BOTH'"/>
+                <ITEM NAME="SIZE" VALUE="D" />
+                <ITEM NAME="DATE" VALUE="E" />
+            </ITEMS>
+        </PARAMETER>
+        
+        <PARAMETER NAME="GLOBEXPRESSIONS" FIELD="CHECK" NUM_ROW="50">
+            <DEFAULT>true</DEFAULT>
+        </PARAMETER>
+        
+        <PARAMETER NAME="FILES" FIELD="TABLE" REQUIRED="false" NUM_ROW="51" NB_LINES="5">
+            <ITEMS>
+                <ITEM NAME="FILEMASK" />
+            </ITEMS>
+        </PARAMETER>
+                
+                
+        <PARAMETER NAME="DIE_ON_ERROR" FIELD="CHECK" NUM_ROW="110">
+            <DEFAULT>false</DEFAULT>
+        </PARAMETER>
+        <!-- end inherited by tsmbfilelist -->
+
+        <PARAMETER FIELD="DIRECTORY" NAME="UPLOADDIR"     NUM_ROW="25" REQUIRED="true" />  
+        <!--- huuu, what shall i do here? -->
+        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="30" REQUIRED="false" />  
+
+        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="100"> 
+            <TABLE READONLY="true"> 
+                <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="size"          TYPE="id_Long" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="true" CUSTOM="true"/>  
+            </TABLE> 
+        </PARAMETER> 
     </PARAMETERS>  
     <ADVANCED_PARAMETERS> 
     </ADVANCED_PARAMETERS>  
     <CODEGENERATION></CODEGENERATION>  
     <RETURNS> 
-        <RETURN AVAILABILITY="FLOW" NAME="AVG_DOWNLOAD_RATE" TYPE="id_Double"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="TIMESPEND" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="TRANSFERRED" TYPE="id_Long"/> 
+        <RETURN AVAILABILITY="AFTER" NAME="AVG_UPLOAD_SPEED" TYPE="id_Double"/> 
+        <RETURN AVAILABILITY="FLOW"  NAME="TIMESPEND_MS" TYPE="id_Long"/> 
+        
+        <RETURN AVAILABILITY="FLOW" NAME="NAME"  TYPE="id_String"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="PATH"  TYPE="id_String"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="SIZE"  TYPE="id_Long"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="UPLOAD_SPEED"  TYPE="id_String"/> 
+
+        <RETURN AVAILABILITY="AFTER" NAME="TRANSFERRED_BYTES" TYPE="id_Long"/> 
         <RETURN AVAILABILITY="AFTER" NAME="ERROR_MESSAGE" TYPE="id_String"/> 
     </RETURNS> 
 </COMPONENT>

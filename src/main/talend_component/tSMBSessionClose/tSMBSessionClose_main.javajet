@@ -1,0 +1,52 @@
+<%@ jet 
+    imports="
+    org.talend.core.model.process.INode 
+    org.talend.core.model.process.ElementParameterParser 
+    org.talend.core.model.metadata.IMetadataTable 
+    org.talend.core.model.metadata.IMetadataColumn 
+    org.talend.core.model.process.IConnection
+    org.talend.core.model.process.IConnectionCategory
+    org.talend.designer.codegen.config.CodeGeneratorArgument
+    org.talend.core.model.metadata.types.JavaTypesManager
+    org.talend.core.model.metadata.types.JavaType
+    java.util.List 
+    java.util.Map		
+    " 
+    %>
+<% 
+    CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
+    INode node = (INode)codeGenArgument.getArgument();
+    String cid = node.getUniqueName();
+    String sessionID  = ElementParameterParser.getValue(node, "__OPEN_SESSION__");
+%>
+
+
+    com.hierynomus.smbj.session.Session <%=cid%>_session = (com.hierynomus.smbj.session.Session) globalMap.get("<%=sessionID%>_session");
+    if(<%=cid%>_session!=null){
+        try {
+            <%=cid%>_session.close();
+            globalMap.remove("<%=sessionID%>_session");
+        } catch (Throwable <%=cid%>_t) { /* ignore */  }
+    }
+    
+    com.hierynomus.smbj.connection.Connection <%=cid%>_connection = (com.hierynomus.smbj.connection.Connection) globalMap.get("<%=sessionID%>_connection");
+    if (<%=cid%>_connection != null && <%=cid%>_connection.isConnected()) {
+        try {
+            <%=cid%>_connection.close();
+        } catch (Throwable <%=cid%>_t) {
+
+            try {
+                <%=cid%>_connection.close(true);
+            } catch (Throwable <%=cid%>_nt) {}
+        }
+        globalMap.remove("<%=sessionID%>_connection");
+    }
+
+        
+    com.hierynomus.smbj.SMBClient <%=cid%>_client = (com.hierynomus.smbj.SMBClient) globalMap.get("<%=sessionID%>_client");
+    if (<%=cid%>_client != null) {
+        try {
+            <%=cid%>_client.close();
+        } catch (Throwable <%=cid%>_t) {}
+        globalMap.remove("<%=sessionID%>_client");
+    }

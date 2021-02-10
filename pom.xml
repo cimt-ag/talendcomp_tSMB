@@ -3,8 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.cimt.talendcomp</groupId>
     <artifactId>talendcomp_tSMB</artifactId>
-    <version>1.1</version>
+    <version>2.5</version>
     <packaging>jar</packaging>
+    <description>
+        Set of Talend Components to work with SMB shares
+    </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -12,16 +15,6 @@
     </properties>
     <build>
         <plugins>
-            <!--
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -38,31 +31,35 @@
                     </archive>
                 </configuration>
             </plugin>
-            -->
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <finalName>${project.name}</finalName>
-                    <descriptors>
-                        <descriptor>assembly.xml</descriptor>
-                    </descriptors>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <phase>deploy</phase>
+                        <id>attach-sources</id>
                         <goals>
-                            <goal>single</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin> 
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>de.cimt.talendcomp</groupId>
                 <artifactId>cimt-talendcomp-maven-plugin</artifactId>
                 <version>2.1</version>
-                <!--<version>1.8.DK1</version>-->
                 <configuration>
                     <componentBaseDir>target/talend_component/</componentBaseDir>
                     <copyFromSourceBaseDir>src/main/talend_component</copyFromSourceBaseDir>
@@ -76,10 +73,29 @@
                         </goals>
                         <configuration>
                             <componentName>tSMBAuthentication</componentName>
-                            
                         </configuration>
                     </execution>
-                   <execution>
+                    <execution>
+                        <id>tSMBSessionOpen</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>component</goal>
+                        </goals>
+                        <configuration>
+                            <componentName>tSMBSessionOpen</componentName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>tSMBSessionClose</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>component</goal>
+                        </goals>
+                        <configuration>
+                            <componentName>tSMBSessionClose</componentName>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>tSMBFileList</id>
                         <phase>install</phase>
                         <goals>
@@ -89,7 +105,7 @@
                             <componentName>tSMBFileList</componentName>
                         </configuration>
                     </execution>
-                   <execution>
+                    <execution>
                         <id>tSMBFileDownload</id>
                         <phase>install</phase>
                         <goals>
@@ -99,7 +115,7 @@
                             <componentName>tSMBFileDownload</componentName>
                         </configuration>
                     </execution>
-                   <execution>
+                    <execution>
                         <id>tSMBFileUpload</id>
                         <phase>install</phase>
                         <goals>
@@ -109,13 +125,22 @@
                             <componentName>tSMBFileUpload</componentName>
                         </configuration>
                     </execution>
-                    
+                    <execution>
+                        <id>tSMBFileDelete</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>component</goal>
+                        </goals>
+                        <configuration>
+                            <componentName>tSMBFileDelete</componentName>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
     <dependencies>
-        <dependency>
+        <!--        <dependency>
             <groupId>jcifs</groupId>
             <artifactId>jcifs</artifactId>
             <version>1.3.17</version>
@@ -126,6 +151,18 @@
                     <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>-->
+        <dependency>
+            <groupId>com.hierynomus</groupId>
+            <artifactId>smbj</artifactId>
+            <version>0.10.0</version>
+            <type>jar</type> 
+        </dependency>
+        <dependency>
+            <groupId>oro</groupId>
+            <artifactId>oro</artifactId>
+            <version>2.0.8</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
 </project>

@@ -14,5 +14,5 @@
 	" 
 %>
 } // end of for loop
+<%@ include file="../tSMBFileList/tSMBCommon_end.javajet"%> 
 
-<%@ include file="./tSMBCommon_end.javajet"%> 

@@ -13,6 +13,11 @@
                 java.util.Map		
 	" 
 %>
-} // end of for loop
+<%@ include file="./tSMBCommon_begin.javajet"%> 
+ 
+for(de.cimt.talendcomp.tsmb.SMBFileStruct <%=cid%>_child : <%=cid%>_handles){
+        
 
-<%@ include file="./tSMBCommon_end.javajet"%> 
+    
+    
+    
