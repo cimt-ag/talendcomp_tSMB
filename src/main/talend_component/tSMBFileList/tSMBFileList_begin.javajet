@@ -10,7 +10,7 @@
 		org.talend.core.model.metadata.types.JavaTypesManager
 		org.talend.core.model.metadata.types.JavaType
 		java.util.List 
-                java.util.Map		
+        java.util.Map
 	" 
 %>
 <%@ include file="./tSMBCommon_begin.javajet"%> 

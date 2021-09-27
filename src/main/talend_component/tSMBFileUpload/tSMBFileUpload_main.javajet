@@ -9,19 +9,22 @@
 		org.talend.designer.codegen.config.CodeGeneratorArgument
 		org.talend.core.model.metadata.types.JavaTypesManager
 		org.talend.core.model.metadata.types.JavaType
-                org.talend.core.model.process.EConnectionType
-                org.talend.core.model.utils.NodeUtil
-                
-                java.util.List 
-                java.util.Map
+        org.talend.core.model.process.EConnectionType
+        org.talend.core.model.utils.NodeUtil
+        java.util.List
+        java.util.Map
 	" 
 %>
 <% 
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
     INode node = (INode)codeGenArgument.getArgument();
     String cid = node.getUniqueName();	
-    final String uploaddir    = ElementParameterParser.getValue(node, "__UPLOADDIR__") ;
+    final String sourcedir    = ElementParameterParser.getValue(node, "__SOURCEFILE__") ;
     final boolean overwrite = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__OVERWRITE__") );
+    // XZ
+    final boolean onserver = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__onServer__"));
+    final String destination = ElementParameterParser.getValue(node, "__DESTINATION__");
+
     List<? extends IConnection> outConns = NodeUtil.getOutgoingConnections(node, IConnectionCategory.DATA);
     final boolean dieOnError  =  "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__DIE_ON_ERROR__") ) ;
 
@@ -29,7 +32,7 @@
     long <%=cid%>_COMPLETED_TRANSFER_BYTES = globalMap.containsKey("<%=cid%>_COMPLETED_TRANSFER_BYTES") ? ((long) globalMap.get("<%=cid%>_COMPLETED_TRANSFER_BYTES")) : 0l;
     long <%=cid%>_TIMESPEND_MS = globalMap.containsKey("<%=cid%>_TIMESPEND_MS") ? ((long) globalMap.get("<%=cid%>_TIMESPEND_MS")) : 0l;
     try{
-        final de.cimt.talendcomp.tsmb.SMBTransferStruct <%=cid%>_file = de.cimt.talendcomp.tsmb.SMBHelper.upload(<%=cid%>_share, <%=cid%>_child, new java.io.File(<%=uploaddir%>), <%=overwrite%>);
+        final de.cimt.talendcomp.tsmb.SMBTransferStruct <%=cid%>_file = de.cimt.talendcomp.tsmb.SMBHelper.upload(<%=cid%>_share, <%=cid%>_child, <%=destination%>, <%=overwrite%>, <%=onserver%>);
         <%=cid%>_COMPLETED_TRANSFER_BYTES += <%=cid%>_file.getSize();
         <%=cid%>_TIMESPEND_MS += <%=cid%>_file.getTimespend();
 
@@ -43,7 +46,7 @@
                <%=cid%>_COMPLETED_TRANSFER_BYTES, <%=cid%>_TIMESPEND_MS
             )
         );
-        globalMap.put("<%=cid%>_COMPLETED_TRANSFER_BYTES"), <%=cid%>_COMPLETED_TRANSFER_BYTES);
+        globalMap.put("<%=cid%>_COMPLETED_TRANSFER_BYTES", <%=cid%>_COMPLETED_TRANSFER_BYTES);
         globalMap.put("<%=cid%>_TIMESPEND_MS", <%=cid%>_TIMESPEND_MS);
 
 

@@ -102,9 +102,13 @@
         </PARAMETER>
         <!-- end inherited by tsmbfilelist -->
 
-        <PARAMETER FIELD="DIRECTORY" NAME="UPLOADDIR"     NUM_ROW="25" REQUIRED="true" />  
+        <PARAMETER FIELD="DIRECTORY" NAME="SOURCEFILE"     NUM_ROW="25" REQUIRED="false" />
+
+        <!-- XK -->
+        <PARAMETER FIELD="DIRECTORY" NAME="DESTINATION" NUM_ROW="30" REQUIRED="true"/>
+        <PARAMETER FIELD="CHECK" NAME="onServer" NUM_ROW="35" REQUIRED="false"/>
         <!--- huuu, what shall i do here? -->
-        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="30" REQUIRED="false" />  
+        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="35" REQUIRED="false" />
 
         <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="100"> 
             <TABLE READONLY="true"> 

@@ -1,5 +1,5 @@
-<%@ jet 
-	imports="
+<%@ jet
+        imports="
 		org.talend.core.model.process.INode 
 		org.talend.core.model.process.ElementParameterParser 
 		org.talend.core.model.metadata.IMetadataTable 
@@ -9,76 +9,105 @@
 		org.talend.designer.codegen.config.CodeGeneratorArgument
 		org.talend.core.model.metadata.types.JavaTypesManager
 		org.talend.core.model.metadata.types.JavaType
-                org.talend.core.model.process.EConnectionType
-                org.talend.core.model.utils.NodeUtil
-                
+        org.talend.core.model.process.EConnectionType
+        org.talend.core.model.utils.NodeUtil
 		java.util.List 
-                java.util.Map		
-	" 
+        java.util.Map
+	"
 %>
 
 // tSMBCommon start
-<% 
+<%
     CodeGeneratorArgument codeGenArgument = (CodeGeneratorArgument) argument;
-    INode node = (INode)codeGenArgument.getArgument();
-    String cid = node.getUniqueName();	
-    final String auth_type    = ElementParameterParser.getValue(node, "__AUTH_TYPE__") ;
-    final String uploaddir= ElementParameterParser.getValue(node, "__UPLOADDIR__");
-    List<Map<String, String>> files = (List<Map<String,String>>)ElementParameterParser.getObjectValue(node, "__FILES__"); 
+    INode node = (INode) codeGenArgument.getArgument();
+    String cid = node.getUniqueName();
+    final String auth_type = ElementParameterParser.getValue(node, "__AUTH_TYPE__");
+    final String uploaddir = ElementParameterParser.getValue(node, "__UPLOADDIR__");
+    final String sourceName = ElementParameterParser.getValue(node, "__SOURCEFILE__");
+    List<Map<String, String>> files = (List<Map<String, String>>) ElementParameterParser.getObjectValue(node, "__FILES__");
 
-    if( !auth_type.equals("C") ){ // NOT USE_SESSION_TYPE%>
-        com.hierynomus.smbj.connection.Connection <%=cid%>_connection = null;
-        com.hierynomus.smbj.SMBClient <%=cid%>_client = null;
-<%  }  %>
-        
-    com.hierynomus.smbj.session.Session <%=cid%>_session = null;
-    
-    try{
-        <%if( !auth_type.equals("C") ){%>
-            <%if( auth_type.equals("B") ){%>
-                com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth = (com.hierynomus.smbj.auth.AuthenticationContext) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION");
-            <%}else if( auth_type.equals("A") ){%>
-                com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth = com.hierynomus.smbj.auth.AuthenticationContext.anonymous(); 
-            <%}%>
+    if (!auth_type.equals("C")) { // NOT USE_SESSION_TYPE%>
+com.hierynomus.smbj.connection.Connection <%=cid%>_connection = null;
+com.hierynomus.smbj.SMBClient <%=cid%>_client = null;
+<% } %>
 
-            <%=cid%>_client = new com.hierynomus.smbj.SMBClient();
-            <%=cid%>_connection = <%=cid%>_client.connect(<%=ElementParameterParser.getValue(node, "__HOSTNAME__")%>);
-            <%=cid%>_session = <%=cid%>_connection.authenticate( <%=cid%>_auth );     
-        <% } else { // USE_SESSION_TYPE %>
-            <%=cid%>_session = (com.hierynomus.smbj.session.Session) globalMap.get( "<%=ElementParameterParser.getValue(node, "__SESSION__")  %>_AUTHENTICATION");
-        <% }%>
-        
-        String[] <%=cid%>_mask=new String[]{
-            <%for (int i = 0; i < files.size(); i++){
-                Map<String, String> line = files.get(i);%>
-                <%=line.get("FILEMASK")%><%if(i < files.size()-1){%>, <%}%>
-            <%}%>            
-        };
-        // prepare list in <%= getClass().getName() %>
-        // uploaddir is set to <%= uploaddir %>
-        final com.hierynomus.smbj.share.DiskShare <%=cid%>_share=(com.hierynomus.smbj.share.DiskShare) <%=cid%>_session.connectShare(<%=ElementParameterParser.getValue(node, "__SHARE__")%>);
-        <%if(getClass().getName().contains("Upload")){ // operation is based on listing of local files %>
-        final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
-            new java.io.File( <%=ElementParameterParser.getValue(node, "__UPLOADDIR__") %> ), 
-            de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
-            <%=cid%>_mask,
-            <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__") ))%>, // GLOBEXPRESSIONS
-            <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__") )%>, 
-             <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__") ))%>
-        );
-        <%} else { // operation is based on listing of remote files%>
-        final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
-            <%=cid%>_share,
-            <%=ElementParameterParser.getValue(node, "__SMBPATH__")%>,
-            de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
-            <%=cid%>_mask,
-            <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__") ))%>, // GLOBEXPRESSIONS
-            <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__") )%>,
-             <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__") ))%>
-        );
-        <%}%>
-            
-        globalMap.put("<%=cid%>_MAX_LINE", ((java.util.List) <%=cid%>_handles).size() );
- 
-        // tSMBCommon end       
-    
+com.hierynomus.smbj.session.Session <%=cid%>_session = null;
+
+try{
+<%if (!auth_type.equals("C")) {%>
+<%if (auth_type.equals("B")) {%>
+com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth = (com.hierynomus.smbj.auth.AuthenticationContext) globalMap.get( "<%=ElementParameterParser.getValue(node, "__AUTHENTICATION__")  %>_AUTHENTICATION");
+<%} else if (auth_type.equals("A")) {%>
+com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth = com.hierynomus.smbj.auth.AuthenticationContext.anonymous();
+<%}%>
+
+<%=cid%>_client = new com.hierynomus.smbj.SMBClient();
+<%=cid%>_connection = <%=cid%>_client.connect(<%=ElementParameterParser.getValue(node, "__HOSTNAME__")%>);
+<%=cid%>_session = <%=cid%>_connection.authenticate( <%=cid%>_auth );
+<% } else { // USE_SESSION_TYPE %>
+<%=cid%>_session = (com.hierynomus.smbj.session.Session) globalMap.get( "<%=ElementParameterParser.getValue(node, "__SESSION__")  %>_AUTHENTICATION");
+<% }%>
+
+String[] <%=cid%>_mask=new String[]{
+<%
+    for (int i = 0; i < files.size(); i++) {
+        Map<String, String> line = files.get(i);
+%>
+<%=line.get("FILEMASK")%><%if (i < files.size() - 1) {%>, <%}%>
+<%}%>
+};
+// prepare list in <%= getClass().getName() %>
+// uploaddir is set to <%= uploaddir %>
+final com.hierynomus.smbj.share.DiskShare <%=cid%>_share=(com.hierynomus.smbj.share.DiskShare) <%=cid%>_session.connectShare(<%=ElementParameterParser.getValue(node, "__SHARE__")%>);
+<%if (getClass().getName().contains("Upload")) { // operation is based on listing of local files %>
+
+// XK: separate the methods based on source dir
+<%if (sourceName.isEmpty() || sourceName == null) { %>
+// for loop for upload
+final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
+<%=cid%>_share,
+<%=ElementParameterParser.getValue(node, "__SMBPATH__")%>,
+de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
+<%=cid%>_mask,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
+<%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
+);
+<%} else if (sourceName.contains(":")){%>
+// upload file
+final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
+new java.io.File(<%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%>),
+de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
+null,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
+<%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
+);
+<%} else {%>
+// upload file
+final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
+<%=cid%>_share,
+<%=ElementParameterParser.getValue(node, "__SMBPATH__")%> + <%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%>,
+de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
+null,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
+<%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
+);
+<%}%>
+
+<%} else { // operation is based on listing of remote files%>
+final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
+<%=cid%>_share,
+<%=ElementParameterParser.getValue(node, "__SMBPATH__")%>,
+de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
+<%=cid%>_mask,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
+<%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
+<%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
+);
+<%}%>
+
+globalMap.put("<%=cid%>_MAX_LINE", ((java.util.List) <%=cid%>_handles).size() );
+
+// tSMBCommon end
