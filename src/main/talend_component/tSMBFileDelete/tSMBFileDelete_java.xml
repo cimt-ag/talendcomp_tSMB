@@ -103,10 +103,12 @@
         </PARAMETER>
         <!-- end inherited by tsmbfilelist -->
                  
-        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="15"> 
-            <TABLE READONLY="true"> 
+        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="false" NUM_ROW="15">
+            <TABLE READONLY="false">
                 <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>
+                <COLUMN NAME="size"          TYPE="id_Long" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="false" CUSTOM="true"/>
             </TABLE> 
         </PARAMETER> 
 
