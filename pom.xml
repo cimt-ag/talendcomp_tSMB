@@ -62,7 +62,6 @@
                 <version>2.1</version>
                 <configuration>
                     <componentBaseDir>target/talend_component/</componentBaseDir>
-                    <copyFromSourceBaseDir>src/main/talend_component</copyFromSourceBaseDir>
                 </configuration>
                 <executions>
                     <execution>
@@ -163,6 +162,12 @@
             <artifactId>oro</artifactId>
             <version>2.0.8</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>RELEASE</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

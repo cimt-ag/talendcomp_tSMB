@@ -108,6 +108,22 @@ de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.ge
 );
 <%}%>
 
+// TODO: hier sort einbauen :)
+Comparator<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_sorting=null;
+<%
+    final String sort_type = ElementParameterParser.getValue(node, "__SORT__");
+    if(sort_type.equalsIgnoreCase("B")){
+%>
+<%=cid%>_sorting=new Comparator<de.cimt.talendcomp.tsmb.SMBFileStruct>(){
+
+};
+<%
+    }
+%>
+
+
+if(sorting!=null)
+Collections.sort(<%=cid%>_handles, <%=cid%>_sorting);
 globalMap.put("<%=cid%>_MAX_LINE", ((java.util.List) <%=cid%>_handles).size() );
 
 // tSMBCommon end
