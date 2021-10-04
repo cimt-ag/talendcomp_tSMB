@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>de.cimt.talendcomp</groupId>
     <artifactId>talendcomp_tSMB</artifactId>
-    <version>2.6</version>
+    <version>2.7</version>
     <packaging>jar</packaging>
     <description>
         Set of Talend Components to work with SMB shares

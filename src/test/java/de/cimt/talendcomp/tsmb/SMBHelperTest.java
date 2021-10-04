@@ -39,9 +39,9 @@ class SMBHelperTest {
         try {
             Connection connection = client.connect("localhost");
             AuthenticationContext authenticationContext = new AuthenticationContext(
-                    "xzhang",
-                    "IchbinSam@91".toCharArray(),
-                    "ad.cimt.de"
+                    "your name",
+                    "your password".toCharArray(),
+                    "your domain"
             );
             session = connection.authenticate(authenticationContext);
             diskShare = (DiskShare) session.connectShare(share);
