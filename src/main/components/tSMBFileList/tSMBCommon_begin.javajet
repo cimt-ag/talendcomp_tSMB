@@ -45,7 +45,8 @@ com.hierynomus.smbj.auth.AuthenticationContext <%=cid%>_auth = com.hierynomus.sm
 <%=cid%>_connection = <%=cid%>_client.connect(<%=ElementParameterParser.getValue(node, "__HOSTNAME__")%>);
 <%=cid%>_session = <%=cid%>_connection.authenticate( <%=cid%>_auth );
 <% } else { // USE_SESSION_TYPE %>
-<%=cid%>_session = (com.hierynomus.smbj.session.Session) globalMap.get( "<%=ElementParameterParser.getValue(node, "__SESSION__")  %>_AUTHENTICATION");
+// XK
+<%=cid%>_session = (com.hierynomus.smbj.session.Session) globalMap.get( "<%=ElementParameterParser.getValue(node, "__SESSION__")  %>_session");
 <% }%>
 
 String[] <%=cid%>_mask=new String[]{
