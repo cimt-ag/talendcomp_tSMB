@@ -1,5 +1,6 @@
 package de.cimt.talendcomp.tsmb;
 
+import com.hierynomus.protocol.commons.buffer.Buffer;
 import com.hierynomus.smbj.SMBClient;
 import com.hierynomus.smbj.auth.AuthenticationContext;
 import com.hierynomus.smbj.connection.Connection;
@@ -39,9 +40,9 @@ class SMBHelperTest {
         try {
             Connection connection = client.connect("localhost");
             AuthenticationContext authenticationContext = new AuthenticationContext(
-                    "your name",
-                    "your password".toCharArray(),
-                    "your domain"
+                    "xzhang",
+                    "IchbinSam@91".toCharArray(),
+                    "ad.cimt.de"
             );
             session = connection.authenticate(authenticationContext);
             diskShare = (DiskShare) session.connectShare(share);
@@ -58,6 +59,21 @@ class SMBHelperTest {
             e.printStackTrace();
         }
         client.close();
+    }
+
+    @Test
+    void share_list_refinement() throws IOException {
+        List<SMBFileStruct> fileStructs = SMBHelper.list(
+                diskShare,
+                "Today\\",
+                SMBHelper.LIST_MODE.parse("FILES"),
+                new String[]{"*.txt"},
+                true,
+                true,
+                true,
+                true
+        );
+        fileStructs.forEach(System.out::println);
     }
 
     @org.junit.jupiter.api.Test
@@ -104,6 +120,7 @@ class SMBHelperTest {
                 true,
                 false);
         fileStruct_4.forEach(System.out::println);
+
         //assertEquals(15, fileStruct_4.size());
 
         // case sensitive for mask
@@ -209,7 +226,7 @@ class SMBHelperTest {
                 smbTransferStruct = SMBHelper.download(
                         diskShare,
                         smbFileStruct,
-                        new File("C:\\Users\\xzhang\\Documents\\workspace\\cimt\\smb\\src\\test\\resources\\local\\dnowload"),
+                        new File("C:\\Users\\xzhang\\Documents\\workspace\\cimt\\smb\\src\\test\\resources\\local\\download1"),
                         false
                 );
                 System.out.println(smbTransferStruct);
@@ -238,9 +255,9 @@ class SMBHelperTest {
     // delete on file name
     @org.junit.jupiter.api.Test
     void delete1() throws IOException {
-        List<SMBFileStruct> fileStruct_7 = SMBHelper.list(diskShare, "Today1\\",
+        List<SMBFileStruct> fileStruct_7 = SMBHelper.list(diskShare, "History\\blablabla.csv",
                 SMBHelper.LIST_MODE.parse("FILES"),
-                null,
+                new String[]{"*.csv"},
                 true,
                 false,
                 true,
@@ -292,7 +309,7 @@ class SMBHelperTest {
 
     // move server to server with change name
     @org.junit.jupiter.api.Test
-    void upload1() throws IOException {
+    void upload1() throws IOException, Buffer.BufferException {
         List<SMBFileStruct> fileStruct_7 = SMBHelper.list(diskShare, "Today\\",
                 SMBHelper.LIST_MODE.parse("FILES"),
                 null,
@@ -316,7 +333,7 @@ class SMBHelperTest {
 
     // move server to server with change name
     @org.junit.jupiter.api.Test
-    void upload2() throws IOException {
+    void upload2() throws IOException, Buffer.BufferException {
         List<SMBFileStruct> fileStruct_7 = SMBHelper.list(diskShare, "Today\\",
                 SMBHelper.LIST_MODE.parse("FILES"),
                 null,
@@ -340,7 +357,7 @@ class SMBHelperTest {
 
     // move local to server without change name
     @org.junit.jupiter.api.Test
-    void upload3() throws IOException {
+    void upload3() throws IOException, Buffer.BufferException {
         // File path
         List<SMBFileStruct> fileStruct_1 = SMBHelper.list(
                 //new File("./target/test-classes/local/download/myTest_3G_ (3).txt"),
@@ -368,7 +385,7 @@ class SMBHelperTest {
 
     // move local to server without change name --> with false overwrite
     @org.junit.jupiter.api.Test
-    void upload4() throws IOException {
+    void upload4() throws IOException, Buffer.BufferException {
         // File path
         List<SMBFileStruct> fileStruct_1 = SMBHelper.list(
                 //new File("./target/test-classes/local/download/myTest_3G_ (3).txt"),
@@ -396,7 +413,7 @@ class SMBHelperTest {
 
     // move local to server with change name
     @org.junit.jupiter.api.Test
-    void upload5() throws IOException {
+    void upload5() throws IOException, Buffer.BufferException {
         // File path
         List<SMBFileStruct> fileStruct_1 = SMBHelper.list(
                 //new File("./target/test-classes/local/download/myTest_3G_ (3).txt"),
@@ -424,7 +441,7 @@ class SMBHelperTest {
 
     // move local to server with change name
     @org.junit.jupiter.api.Test
-    void upload6() throws IOException {
+    void upload6() throws IOException, Buffer.BufferException {
         // File path
         List<SMBFileStruct> fileStruct_1 = SMBHelper.list(
                 //new File("./target/test-classes/local/download/myTest_3G_ (3).txt"),
@@ -452,7 +469,7 @@ class SMBHelperTest {
 
     // move local to server with file name
     @org.junit.jupiter.api.Test
-    void upload7() throws IOException {
+    void upload7() throws IOException, Buffer.BufferException {
         // File path
         List<SMBFileStruct> fileStruct_1 = SMBHelper.list(
                 //new File("./target/test-classes/local/download/myTest_3G_ (3).txt"),

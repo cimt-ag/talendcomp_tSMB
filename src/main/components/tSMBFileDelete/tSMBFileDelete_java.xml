@@ -105,8 +105,8 @@
                  
         <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="false" NUM_ROW="15">
             <TABLE READONLY="false">
-                <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>
+                <COLUMN NAME="name"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
                 <COLUMN NAME="size"          TYPE="id_Long" READONLY="false" CUSTOM="true"/>
                 <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="false" CUSTOM="true"/>
             </TABLE> 
@@ -117,8 +117,8 @@
     </ADVANCED_PARAMETERS>  
     <CODEGENERATION></CODEGENERATION>  
     <RETURNS> 
-        <RETURN AVAILABILITY="FLOW" NAME="PATH" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="NAME" TYPE="id_Integer"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="PATH" TYPE="id_String"/>
+        <RETURN AVAILABILITY="FLOW" NAME="NAME" TYPE="id_String"/>
         <RETURN AVAILABILITY="FLOW" NAME="MAX_LINE" TYPE="id_Integer"/> 
         <RETURN AVAILABILITY="FLOW" NAME="NB_LINE"  TYPE="id_Integer"/> 
     </RETURNS> 

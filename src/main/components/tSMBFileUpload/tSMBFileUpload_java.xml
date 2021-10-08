@@ -113,20 +113,20 @@
         <!-- XK -->
         <PARAMETER FIELD="CHECK" NAME="NAME_CONTAINED" NUM_ROW="35" REQUIRED="false" />
 
-        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="100"> 
-            <TABLE READONLY="true"> 
-                <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="size"          TYPE="id_Long" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="true" CUSTOM="true"/>  
+        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="false" NUM_ROW="100">
+            <TABLE READONLY="false">
+                <COLUMN NAME="name"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="size"          TYPE="id_Long" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="false" CUSTOM="true"/>
             </TABLE> 
         </PARAMETER> 
     </PARAMETERS>  
     <ADVANCED_PARAMETERS> 
-    </ADVANCED_PARAMETERS>  
-    <CODEGENERATION></CODEGENERATION>  
+    </ADVANCED_PARAMETERS>
+    <CODEGENERATION/>
     <RETURNS> 
-        <RETURN AVAILABILITY="AFTER" NAME="AVG_UPLOAD_SPEED" TYPE="id_Double"/> 
+        <RETURN AVAILABILITY="AFTER" NAME="AVG_UPLOAD_SPEED" TYPE="id_String"/>
         <RETURN AVAILABILITY="FLOW"  NAME="TIMESPEND_MS" TYPE="id_Long"/> 
         
         <RETURN AVAILABILITY="FLOW" NAME="NAME"  TYPE="id_String"/> 
@@ -134,7 +134,7 @@
         <RETURN AVAILABILITY="FLOW" NAME="SIZE"  TYPE="id_Long"/> 
         <RETURN AVAILABILITY="FLOW" NAME="UPLOAD_SPEED"  TYPE="id_String"/> 
 
-        <RETURN AVAILABILITY="AFTER" NAME="TRANSFERRED_BYTES" TYPE="id_Long"/> 
-        <RETURN AVAILABILITY="AFTER" NAME="ERROR_MESSAGE" TYPE="id_String"/> 
+        <RETURN AVAILABILITY="AFTER" NAME="COMPLETED_TRANSFER_BYTES" TYPE="id_Long"/>
+        <RETURN AVAILABILITY="FLOW" NAME="LAST_ERROR_MESSAGE" TYPE="id_String"/>
     </RETURNS> 
 </COMPONENT>

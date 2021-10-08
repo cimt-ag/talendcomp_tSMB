@@ -16,4 +16,6 @@
 <%@ include file="../tSMBFileList/tSMBCommon_begin.javajet"%> 
 
 for(de.cimt.talendcomp.tsmb.SMBFileStruct <%=cid%>_child : <%=cid%>_handles){
+// Xk
+globalMap.put("<%=cid%>_NB_LINE", ((java.util.List) <%=cid%>_handles).indexOf(<%=cid%>_child) + 1);
         

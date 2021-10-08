@@ -116,11 +116,12 @@
         </PARAMETER>
     </PARAMETERS>  
     <ADVANCED_PARAMETERS> 
-    </ADVANCED_PARAMETERS>  
-    <CODEGENERATION></CODEGENERATION>  
+    </ADVANCED_PARAMETERS>
+    <CODEGENERATION/>
     <RETURNS> 
-        <RETURN AVAILABILITY="FLOW" NAME="MAX_LINE" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="NB_LINE"  TYPE="id_Integer"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="MAX_LINE" TYPE="id_Integer"/>
+        <!-- NB Line should be understood as current line -->
+        <RETURN AVAILABILITY="FLOW" NAME="NB_LINE"  TYPE="id_Integer"/>
         
         <RETURN AVAILABILITY="FLOW" NAME="NAME"  TYPE="id_String"/> 
         <RETURN AVAILABILITY="FLOW" NAME="PATH"  TYPE="id_String"/> 

@@ -56,7 +56,7 @@
         <%}%>            
 
     }catch(Exception <%=cid%>_download_ex ){
-        globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_download_ex.getMessage());
+        globalMap.put("<%=cid%>_LAST_ERROR_MESSAGE", <%=cid%>_download_ex.getMessage());
         globalMap.put("<%=cid%>_ERROR", <%=cid%>_download_ex );
         <% if(dieOnError){%>
             throw <%=cid%>_download_ex;            

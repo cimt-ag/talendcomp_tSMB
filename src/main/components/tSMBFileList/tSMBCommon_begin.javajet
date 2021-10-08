@@ -77,11 +77,11 @@ de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.ge
 <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
 );
 <%} else if (sourceName.contains(":")){%>
-// upload file
+// upload file from local to server
 final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
 new java.io.File(<%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%>),
 de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
-null,
+<%=cid%>_mask,
 <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
 <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__CASE_SENSITIVE__"))%>,
 <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
@@ -93,7 +93,7 @@ final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de
 <%=cid%>_share,
 <%=ElementParameterParser.getValue(node, "__SMBPATH__")%> + <%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%>,
 de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.getValue(node, "__LIST_MODE__")%>" ),
-null,
+<%=cid%>_mask,
 <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__GLOBEXPRESSIONS__")))%>, // GLOBEXPRESSIONS
 <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__CASE_SENSITIVE__"))%>,
 <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
@@ -114,7 +114,6 @@ de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.ge
 );
 <%}%>
 
-// TODO: hier sort einbauen :)
 // XK
 Comparator<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_sorting=null;
 

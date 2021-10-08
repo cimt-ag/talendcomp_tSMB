@@ -391,11 +391,7 @@ public class SMBHelper {
         } else {
             // XK: add error handle for overwrite == false
             // warning: in the source code, overwrite has only impact on whether to overwrite a file or create a file
-            try {
-                SmbFiles.copy(new java.io.File(file.getAbsolutePath()), diskShare, fullpath, overwrite);
-            } catch (SMBApiException fileExists) {
-                fileExists.printStackTrace();
-            }
+            SmbFiles.copy(new java.io.File(file.getAbsolutePath()), diskShare, fullpath, overwrite);
         }
 
         return new SMBTransferStruct(
@@ -409,7 +405,7 @@ public class SMBHelper {
     }
 
     public static synchronized SMBTransferStruct upload(DiskShare diskShare, SMBFileStruct file, String
-            destPath, boolean overwrite, boolean onserver, boolean givingNewName) throws SMBApiException, IOException {
+            destPath, boolean overwrite, boolean onserver, boolean givingNewName) throws SMBApiException, IOException, Buffer.BufferException {
         // todo: should have to check whether the destPath is a path or a file!!!
         // info: possible to think a better way to verify the destPath
         final long ts = System.currentTimeMillis();
@@ -431,18 +427,17 @@ public class SMBHelper {
                 SMB2CreateDisposition.FILE_OPEN,
                 null);
 
-        try {
-            File output = diskShare.openFile(destPath,
-                    EnumSet.of(AccessMask.GENERIC_WRITE),
-                    null,
-                    SMB2ShareAccess.ALL,
-                    overwrite ? SMB2CreateDisposition.FILE_OVERWRITE_IF : SMB2CreateDisposition.FILE_CREATE,
-                    null);
+        File output = diskShare.openFile(destPath,
+                EnumSet.of(AccessMask.GENERIC_WRITE),
+                null,
+                SMB2ShareAccess.ALL,
+                overwrite ? SMB2CreateDisposition.FILE_OVERWRITE_IF : SMB2CreateDisposition.FILE_CREATE,
+                null);
 
-            input.remoteCopyTo(output);
-        } catch (Buffer.BufferException | TransportException | SMBApiException exception) {
+        input.remoteCopyTo(output);
+        /*catch (Buffer.BufferException | TransportException | SMBApiException exception) {
             exception.printStackTrace();
-        }
+        }*/
         return new SMBTransferStruct(
                 new SMBFileStruct(
                         diskShare.getSmbPath().toString(),

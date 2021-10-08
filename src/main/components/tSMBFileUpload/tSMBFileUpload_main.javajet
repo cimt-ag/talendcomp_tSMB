@@ -61,7 +61,7 @@
 
 
     }catch(Exception <%=cid%>_upload_ex ){
-        globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_upload_ex.getMessage());
+        globalMap.put("<%=cid%>_LAST_ERROR_MESSAGE", <%=cid%>_upload_ex.getMessage());
         globalMap.put("<%=cid%>_ERROR", <%=cid%>_upload_ex );
         <% if(dieOnError){%>
             throw <%=cid%>_upload_ex;            
