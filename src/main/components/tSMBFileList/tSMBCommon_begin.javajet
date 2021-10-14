@@ -24,6 +24,9 @@
     final String auth_type = ElementParameterParser.getValue(node, "__AUTH_TYPE__");
     final String uploaddir = ElementParameterParser.getValue(node, "__UPLOADDIR__");
     final String sourceName = ElementParameterParser.getValue(node, "__SOURCEFILE__");
+
+    // Xk
+    final boolean onServer = "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__onServer__"));
     List<Map<String, String>> files = (List<Map<String, String>>) ElementParameterParser.getObjectValue(node, "__FILES__");
 
     if (!auth_type.equals("C")) { // NOT USE_SESSION_TYPE%>
@@ -64,7 +67,7 @@ final com.hierynomus.smbj.share.DiskShare <%=cid%>_share=(com.hierynomus.smbj.sh
 
 // XK: separate the methods based on source dir
 // use the main list method
-<%if (sourceName.isEmpty() || sourceName == null) { %>
+<%if (sourceName.isEmpty() || sourceName == null || onServer) { %>
 // for loop for upload
 final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
 <%=cid%>_share,
@@ -76,7 +79,7 @@ de.cimt.talendcomp.tsmb.SMBHelper.LIST_MODE.parse( "<%=ElementParameterParser.ge
 <%="true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__LIST_SUBDIRS__"))%>,
 <%=(("YES").equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")) || "true".equalsIgnoreCase(ElementParameterParser.getValue(node, "__INCLUDE_HIDDEN__")))%>
 );
-<%} else if (sourceName.contains(":")){%>
+<%} else if (!onServer){%>
 // upload file from local to server
 final java.util.List<de.cimt.talendcomp.tsmb.SMBFileStruct> <%=cid%>_handles= de.cimt.talendcomp.tsmb.SMBHelper.list(
 new java.io.File(<%=ElementParameterParser.getValue(node, "__SOURCEFILE__")%>),
