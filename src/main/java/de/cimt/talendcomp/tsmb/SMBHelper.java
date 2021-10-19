@@ -17,14 +17,15 @@ import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import com.hierynomus.smbj.utils.SmbFiles;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.oro.text.GlobCompiler;
 
@@ -375,12 +376,19 @@ public class SMBHelper {
 
     // XK
     // info: this upload method can only be used for local file upload into remote server
+    // info: trying to integrate the function to upload GZIP File
     public static synchronized SMBTransferStruct upload(DiskShare diskShare, SMBFileStruct file, String
             destPath, boolean overwrite, boolean givingNewName) throws SMBApiException, IOException {
         // XK: if a new name is given
         // warning: we have to check whether the destPath fullpath is or not!!!
+
+        // handle gzip file
+        String filename = file.getName().endsWith("gz") ?
+                file.getName().substring(0, file.getName().lastIndexOf(".")) :
+                file.getName();
+
         String fullpath = givingNewName ? destPath :
-                destPath + (!destPath.endsWith("\\") ? "\\" : "") + file.getName();
+                destPath + (!destPath.endsWith("\\") ? "\\" : "") + filename;
 
         final long ts = System.currentTimeMillis();
 
@@ -388,10 +396,15 @@ public class SMBHelper {
             if (!diskShare.folderExists(fullpath)) {
                 diskShare.mkdir(fullpath);
             }
+        }
+        // info: handle GZIP File
+        else if (file.getName().endsWith("gz")) {
+            // todo: GZIP File upload
+            GZIPUpload(Paths.get(file.getAbsolutePath().replace("\\", "/")), diskShare, fullpath, overwrite);
         } else {
             // XK: add error handle for overwrite == false
             // warning: in the source code, overwrite has only impact on whether to overwrite a file or create a file
-            SmbFiles.copy(new java.io.File(file.getAbsolutePath()), diskShare, fullpath, overwrite);
+            SmbFiles.copy(new java.io.File(file.getAbsolutePath().replace("\\", "/")), diskShare, fullpath, overwrite);
         }
 
         return new SMBTransferStruct(
@@ -446,6 +459,26 @@ public class SMBHelper {
                         diskShare.getFileInformation(destPath)),
                 System.currentTimeMillis() - ts
         );
+    }
+
+    // add GZIP Upload method
+    private static synchronized void GZIPUpload(Path sourcePath, DiskShare share, String destPath, boolean overwrite) throws IOException {
+        try (GZIPInputStream gis = new GZIPInputStream(Files.newInputStream(sourcePath, StandardOpenOption.READ))) {
+            try (OutputStream target = share.openFile(
+                    destPath,
+                    EnumSet.of(AccessMask.GENERIC_ALL),
+                    null,
+                    SMB2ShareAccess.ALL,
+                    overwrite ? SMB2CreateDisposition.FILE_OVERWRITE_IF : SMB2CreateDisposition.FILE_CREATE,
+                    null
+            ).getOutputStream()) {
+                int bytesRead;
+                byte[] buffer = new byte[8192];
+                while ((bytesRead = gis.read(buffer)) > 0) {
+                    target.write(buffer, 0, bytesRead);
+                }
+            }
+        }
     }
 
     // add sort method
