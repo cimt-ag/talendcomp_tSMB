@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <COMPONENT> 
     <HEADER AUTHOR="cimt AG" COMPATIBILITY="ALL" 
              
@@ -21,8 +20,7 @@
         <CONNECTOR CTYPE="COMPONENT_ERROR" />
     </CONNECTORS>  
     <PARAMETERS> 
-         
-                <!-- start intherited by tsmbfilelist -->
+          <!-- start intherited by tsmbfilelist -->
                  
         <PARAMETER FIELD="CLOSED_LIST" NAME="AUTH_TYPE" NUM_ROW="1"> 
             <ITEMS DEFAULT="ANONYMOUS_ACCESS">
@@ -97,27 +95,46 @@
                 <ITEM NAME="FILEMASK" />
             </ITEMS>
         </PARAMETER>
-        
+                
+                
         <PARAMETER NAME="DIE_ON_ERROR" FIELD="CHECK" NUM_ROW="110">
             <DEFAULT>false</DEFAULT>
         </PARAMETER>
         <!-- end inherited by tsmbfilelist -->
-                 
-        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="true" NUM_ROW="15"> 
-            <TABLE READONLY="true"> 
-                <COLUMN NAME="name"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
-                <COLUMN NAME="path"          TYPE="id_String" READONLY="true" CUSTOM="true"/>  
+
+        <PARAMETER FIELD="DIRECTORY" NAME="SOURCEFILE"     NUM_ROW="25" REQUIRED="false" />
+
+        <!-- XK -->
+        <PARAMETER FIELD="DIRECTORY" NAME="DESTINATION" NUM_ROW="30" REQUIRED="true"/>
+        <PARAMETER FIELD="CHECK" NAME="onServer" NUM_ROW="35" REQUIRED="false"/>
+        <!--- huuu, what shall i do here? -->
+        <PARAMETER FIELD="CHECK" NAME="OVERWRITE"     NUM_ROW="35" REQUIRED="false" />
+
+        <!-- XK -->
+        <PARAMETER FIELD="CHECK" NAME="NAME_CONTAINED" NUM_ROW="35" REQUIRED="false" />
+
+        <PARAMETER NAME="OUTPUT_SCHEMA" FIELD="SCHEMA_TYPE" REQUIRED="false" NUM_ROW="100">
+            <TABLE READONLY="false">
+                <COLUMN NAME="name"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="path"          TYPE="id_String" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="size"          TYPE="id_Long" READONLY="false" CUSTOM="true"/>
+                <COLUMN NAME="timespend"     TYPE="id_Long" READONLY="false" CUSTOM="true"/>
             </TABLE> 
         </PARAMETER> 
-
     </PARAMETERS>  
     <ADVANCED_PARAMETERS> 
-    </ADVANCED_PARAMETERS>  
-    <CODEGENERATION></CODEGENERATION>  
+    </ADVANCED_PARAMETERS>
+    <CODEGENERATION/>
     <RETURNS> 
-        <RETURN AVAILABILITY="FLOW" NAME="PATH" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="NAME" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="MAX_LINE" TYPE="id_Integer"/> 
-        <RETURN AVAILABILITY="FLOW" NAME="NB_LINE"  TYPE="id_Integer"/> 
+        <RETURN AVAILABILITY="AFTER" NAME="AVG_UPLOAD_SPEED" TYPE="id_String"/>
+        <RETURN AVAILABILITY="FLOW"  NAME="TIMESPEND_MS" TYPE="id_Long"/> 
+        
+        <RETURN AVAILABILITY="FLOW" NAME="NAME"  TYPE="id_String"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="PATH"  TYPE="id_String"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="SIZE"  TYPE="id_Long"/> 
+        <RETURN AVAILABILITY="FLOW" NAME="UPLOAD_SPEED"  TYPE="id_String"/> 
+
+        <RETURN AVAILABILITY="AFTER" NAME="COMPLETED_TRANSFER_BYTES" TYPE="id_Long"/>
+        <RETURN AVAILABILITY="FLOW" NAME="LAST_ERROR_MESSAGE" TYPE="id_String"/>
     </RETURNS> 
 </COMPONENT>

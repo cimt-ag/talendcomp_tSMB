@@ -42,6 +42,6 @@
         globalMap.put("<%=cid%>_ERROR_MESSAGE", <%=cid%>_delete_ex.getMessage());
         globalMap.put("<%=cid%>_ERROR", <%=cid%>_delete_ex );
         <% if(dieOnError){%>
-            throw <%=cid%>_download_ex;            
+            throw <%=cid%>_delete_ex;
         <%}%>
     }
