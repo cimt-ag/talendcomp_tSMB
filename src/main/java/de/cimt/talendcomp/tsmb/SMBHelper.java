@@ -259,7 +259,15 @@ public class SMBHelper {
 
         File handle = null;
         FileOutputStream out = null;
-        java.io.File destinationFile = new java.io.File(destinationFolder.getAbsolutePath() + "\\" + source.getRelativePath());
+
+        //xk
+        java.io.File destinationFile = null;
+        if (destinationFolder.toString().contains("/")) {
+            destinationFile = new java.io.File(destinationFolder.getAbsolutePath() + "/" + source.getRelativePath());
+        } else {
+            destinationFile = new java.io.File(destinationFolder.getAbsolutePath() + "\\" + source.getRelativePath());
+        }
+
         if (copyToFile) {
             destinationFile = destinationFolder;
         }
